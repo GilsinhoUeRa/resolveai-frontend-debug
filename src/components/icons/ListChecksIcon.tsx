@@ -1,0 +1,35 @@
+
+import React from 'react';
+import { COLORS } from '@/constants';
+
+interface IconProps extends React.SVGProps<SVGSVGElement> {
+  isActive?: boolean;
+  size?: number | string;
+}
+
+const ListChecksIcon: React.FC<IconProps> = ({ isActive, size = 24, className = '', ...props }) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke={isActive ? COLORS.ORANGE_ENERGIA : COLORS.CINZA_NEUTRO}
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={`transition-colors duration-200 ${className}`}
+      {...props}
+    >
+      <path d="M8 6h10" />
+      <path d="M6 12h12" />
+      <path d="M6 18h12" />
+      <path d="M3 6l1 1 2-2" />
+      <path d="M3 12l1 1 2-2" />
+      <path d="M3 18l1 1 2-2" />
+    </svg>
+  );
+};
+
+export default ListChecksIcon;
