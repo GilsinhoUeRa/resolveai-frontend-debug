@@ -1,13 +1,20 @@
+// src/index.tsx
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './src/App';
-import './src/index.css';
-import { AuthProvider } from './src/hooks/useAuth';
-import { ToastProvider } from './src/hooks/useToast';
-import { ChatProvider } from './src/hooks/useChat';
-import { AppNotificationProvider } from './src/hooks/useAppNotifications';
-import { FavoritesProvider } from './src/hooks/useFavorites'; // Import FavoritesProvider
+
+// Importações de Lógica e Contexto
+import { AuthProvider } from '@/hooks/useAuth';
+import { ToastProvider } from '@/hooks/useToast';
+import { ChatProvider } from '@/hooks/useChat';
+import { AppNotificationProvider } from '@/hooks/useAppNotifications';
+import { FavoritesProvider } from '@/hooks/useFavorites';
+
+// Importação do Componente Principal da Aplicação
+import App from '@/App'; // Usando o alias para o caminho correto
+
+// A ÚNICA importação de CSS necessária
+import '@/index.css';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -19,7 +26,7 @@ root.render(
   <React.StrictMode>
     <ToastProvider>
       <AuthProvider>
-        <FavoritesProvider> {/* Add FavoritesProvider here */}
+        <FavoritesProvider>
           <ChatProvider>
             <AppNotificationProvider>
               <App />

@@ -1,4 +1,3 @@
-
 import React, { useState, FormEvent } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Input from '@/components/Input';
@@ -27,10 +26,11 @@ const LoginPage: React.FC = () => {
       await login(email, password);
       navigate(from, { replace: true });
     } catch (err: any) {
-      setError(err.message || 'Falha ao fazer login. Verifique suas credenciais.');
+      setError(
+        err.message || 'Falha ao fazer login. Verifique suas credenciais.'
+      );
     }
   };
-
   return (
     <div className="min-h-[calc(100vh-200px)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 bg-white p-8 sm:p-10 rounded-xl shadow-2xl">
@@ -41,11 +41,18 @@ const LoginPage: React.FC = () => {
           </h2>
           <p className="mt-2 text-sm text-cinza-neutro">
             Ou{' '}
-            <Link to={APP_ROUTES.REGISTER} className="font-medium text-orange-energia hover:text-opacity-80">
+            <Link
+              to={APP_ROUTES.REGISTER}
+              className="font-medium text-orange-energia hover:text-opacity-80"
+            >
               crie uma nova conta aqui
             </Link>
+			
           </p>
         </div>
+		<h1 className="text-3xl font-bold p-4 underline decoration-wavy !bg-red-600 !text-yellow-300">
+  TESTE DE PRIORIDADE
+</h1>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit} noValidate>
           <Input
             label="Endereço de e-mail"
@@ -67,7 +74,12 @@ const LoginPage: React.FC = () => {
             placeholder="Sua senha"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            error={error && (error.includes('senha') || error.includes('credenciais')) ? error : undefined}
+            error={
+              error &&
+              (error.includes('senha') || error.includes('credenciais'))
+                ? error
+                : undefined
+            }
           />
 
           {/* <div className="flex items-center justify-between">
@@ -80,25 +92,41 @@ const LoginPage: React.FC = () => {
             </div>
           </div> */}
 
-          {error && !error.includes('email') && !error.includes('senha') && !error.includes('credenciais') && (
-            <p className="text-sm text-red-600 text-center">{error}</p>
-          )}
+          {error &&
+            !error.includes('email') &&
+            !error.includes('senha') &&
+            !error.includes('credenciais') && (
+              <p className="text-sm text-red-600 text-center">{error}</p>
+            )}
 
           <div>
-            <Button type="submit" isLoading={loading} fullWidth variant="primary" size="lg">
+            <Button
+              type="submit"
+              isLoading={loading}
+              fullWidth
+              variant="primary"
+              size="lg"
+            >
               {loading ? 'Entrando...' : 'Entrar'}
             </Button>
           </div>
         </form>
         <p className="mt-6 text-center text-xs text-cinza-neutro">
           Ao continuar, você concorda com nossos{' '}
-          <Link to={APP_ROUTES.TERMS_OF_SERVICE} className="underline hover:text-orange-energia">
+          <Link
+            to={APP_ROUTES.TERMS_OF_SERVICE}
+            className="underline hover:text-orange-energia"
+          >
             Termos de Serviço
           </Link>{' '}
           e{' '}
-          <Link to={APP_ROUTES.PRIVACY_POLICY} className="underline hover:text-orange-energia">
+          <Link
+            to={APP_ROUTES.PRIVACY_POLICY}
+            className="underline hover:text-orange-energia"
+          >
             Política de Privacidade
-          </Link>.
+          </Link>
+          .
         </p>
       </div>
     </div>

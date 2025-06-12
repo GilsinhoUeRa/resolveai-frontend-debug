@@ -1,4 +1,4 @@
-import { ProfessionCategory, Profession, Specialty, SubscriptionPlan } from './types'; 
+import { ProfessionCategory, Profession, Specialty, SubscriptionPlan } from '@/types'; 
 
 export const APP_NAME = "ResolveAi";
 export const APP_SLOGAN = "Conectando quem precisa com quem resolve";
