@@ -123,9 +123,6 @@ const HomePage: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <header className="mb-10 text-center">
-	  <h1 className="bg-green-400 text-purple-800 text-5xl font-extrabold p-8 underline decoration-wavy">
-  Tailwind Está Funcionando!
-</h1>
         <h1 className="text-4xl font-bold text-grafite-profundo mb-2">
           Olá, {user?.name?.split(' ')[0] || 'Usuário'}!
         </h1>

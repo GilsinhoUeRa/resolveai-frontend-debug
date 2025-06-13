@@ -8,6 +8,12 @@ const api = axios.create({
   timeout: 10000,
 });
 
+// Tipagem para os dados que enviaremos para criar uma avaliação
+export interface NovaAvaliacaoPayload {
+  nota: number;
+  comentario: string;
+}
+
 // 2. Define a "forma" dos nossos dados com interfaces TypeScript.
 export interface Servico {
   id: number;
@@ -24,6 +30,33 @@ interface GetServicosParams {
   q?: string;
   categoria?: string;
 }
+
+export const getProviderById = async (id: string): Promise<ProviderDetails> => {
+  const response = await api.get(`/usuarios/${id}`); // Assumindo que sua rota de perfil usa /usuarios/:id
+  return response.data;
+};
+
+export const getReviewsByProvider = async (providerId: string): Promise<Review[]> => {
+  // Nota: O backend precisa ter esta rota implementada
+  const response = await api.get(`/servicos/reviews/provider/${providerId}`);
+  return response.data;
+};
+
+export const createReview = async (providerId: string, rating: number, comment: string): Promise<any> => {
+  // Nota: O backend precisa ter esta rota implementada e protegida
+  const response = await api.post(`/providers/${providerId}/reviews`, { rating, comment });
+  return response.data;
+};
+
+// Função que faz a chamada POST para o backend
+export const criarAvaliacao = async (
+  payload: NovaAvaliacaoPayload,
+  servicoId: number
+): Promise<any> => { // O 'any' pode ser substituído pela interface da avaliação criada
+  // Nossa rota no backend é: POST /api/servicos/:servicoId/avaliacoes
+  const response = await api.post(`/servicos/${servicoId}/avaliacoes`, payload);
+  return response.data;
+};
 
 // 3. Cria e exporta a função para buscar os serviços.
 export const getServicos = async (params: GetServicosParams = {}): Promise<Servico[]> => {

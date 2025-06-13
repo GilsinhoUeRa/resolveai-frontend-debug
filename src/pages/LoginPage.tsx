@@ -50,9 +50,6 @@ const LoginPage: React.FC = () => {
 			
           </p>
         </div>
-		<h1 className="text-3xl font-bold p-4 underline decoration-wavy !bg-red-600 !text-yellow-300">
-  TESTE DE PRIORIDADE
-</h1>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit} noValidate>
           <Input
             label="Endereço de e-mail"

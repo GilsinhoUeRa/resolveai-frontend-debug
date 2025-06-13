@@ -1,17 +1,17 @@
 
 import React from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'; // Adicionado useNavigate
-import Logo from '../Logo';
-import { APP_NAME, APP_ROUTES, COLORS } from '../../constants';
-import { useAuth } from '../../hooks/useAuth';
-import Button from '../Button';
-import HomeIcon from '../icons/HomeIcon';
-import ListChecksIcon from '../icons/ListChecksIcon'; 
-import SparkleIcon from '../icons/SparkleIcon'; 
-import UsersIcon from '../icons/UsersIcon'; 
-import SettingsIcon from '../icons/SettingsIcon'; 
-import LayoutGridIcon from '../icons/LayoutGridIcon'; 
-import ArrowLeftIcon from '../icons/ArrowLeftIcon'; // Ícone para "Voltar para o Site"
+import Logo from '@/components/Logo';
+import { APP_NAME, APP_ROUTES} from '@/constants';
+import { useAuth } from '@/hooks/useAuth';
+import Button from '@/components/Button';
+import HomeIcon from '@/components/icons/HomeIcon';
+import ListChecksIcon from '@/components/icons/ListChecksIcon'; 
+import SparkleIcon from '@/components/icons/SparkleIcon'; 
+import UsersIcon from '@/components/icons/UsersIcon'; 
+import SettingsIcon from '@/components/icons/SettingsIcon'; 
+import LayoutGridIcon from '@/components/icons/LayoutGridIcon'; 
+import ArrowLeftIcon from '@/components/icons/ArrowLeftIcon'; // Ícone para "Voltar para o Site"
 
 interface AdminSidebarLinkProps {
   to: string;

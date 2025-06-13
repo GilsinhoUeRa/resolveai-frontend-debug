@@ -5,9 +5,15 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
-  // ADICIONE ESTA NOVA SEÇÃO
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        'orange-energia': '#f57c00',
+        'grafite-profundo': '#212121',
+        'cinza-neutro': '#9e9e9e',
+        'light-bg': '#f4f4f5',
+      }
+    },
   },
   plugins: [],
 }
