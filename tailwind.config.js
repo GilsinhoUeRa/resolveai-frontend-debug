@@ -1,4 +1,5 @@
-// tailwind.config.js
+// E:/.../resolveai-frontend/tailwind.config.js
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -12,6 +13,11 @@ export default {
         'grafite-profundo': '#212121',
         'cinza-neutro': '#9e9e9e',
         'light-bg': '#f4f4f5',
+        'white': '#ffffff',
+        'success': '#4caf50', 
+        'error': '#f44336',   
+        'info': '#2196f3',    
+        'warning': '#ff9800'
       }
     },
   },

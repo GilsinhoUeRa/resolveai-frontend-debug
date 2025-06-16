@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { AppNotification, AppNotificationContextType, ChatSession } from '@/types';
 import { useAuth } from '@/hooks/useAuth';

@@ -1,14 +1,10 @@
-// src/pages/ProviderProfilePage.tsx (Versão Refatorada)
+// src/pages/ProviderProfilePage.tsx (Versão Final Corrigida)
 
 import React, { useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-
-// Funções da API que precisaremos (vamos criá-las no Passo 2)
-import { getProviderById, getReviewsByProvider, createReview } from '@/services/api'; 
-import { Review as ReviewType } from '@/types';
-
-// Seus componentes de UI
+import { getProviderById, getReviewsByProvider, createReview } from '@/services/api';
+import { Review as ReviewType, ProviderDetails } from '@/types';
 import StarRating from '@/components/StarRating';
 import ReviewCard from '@/components/ReviewCard';
 import Button from '@/components/Button';
@@ -20,63 +16,79 @@ import { APP_ROUTES } from '@/constants';
 
 const ProviderProfilePage: React.FC = () => {
   const { providerId } = useParams<{ providerId: string }>();
-  const { user } = useAuth();
-  const { addToast } = useToast();
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { addToast } = useToast();
+  const { user } = useAuth();
+  
+  // Estados para controlar os campos do formulário
+  const [newRating, setNewRating] = useState(0);
+  const [newComment, setNewComment] = useState('');
 
-  // 1. BUSCANDO DADOS DO PRESTADOR COM useQuery
-  const { data: provider, isLoading: isLoadingProvider, isError: isProviderError } = useQuery({
-    queryKey: ['provider', providerId], // A chave inclui o ID para ser única
-    queryFn: () => getProviderById(providerId!), // '!' para garantir ao TS que providerId existe
-    enabled: !!providerId, // Só executa a query se o providerId existir
-  });
-
-  // 2. BUSCANDO AS AVALIAÇÕES COM useQuery
-  const { data: reviews, isLoading: isLoadingReviews } = useQuery({
-    queryKey: ['reviews', providerId],
-    queryFn: () => getReviewsByProvider(providerId!),
+  // BUSCANDO DADOS DO PRESTADOR
+  const { data: provider, isLoading: isLoadingProvider, isError } = useQuery<ProviderDetails, Error>({
+    queryKey: ['provider', providerId],
+    queryFn: () => getProviderById(providerId!),
     enabled: !!providerId,
   });
 
-// 3. CONFIGURANDO A MUTAÇÃO PARA CRIAR UMA NOVA AVALIAÇÃO
+  // BUSCANDO AS AVALIAÇÕES
+  const { data: reviews, isLoading: isLoadingReviews } = useQuery<ReviewType[], Error>({
+    queryKey: ['reviews', providerId],
+    queryFn: () => getReviewsByProvider(providerId!),
+    enabled: !!provider, // Só busca as avaliações depois que os dados do prestador chegarem
+  });
+
+  // CONFIGURANDO A MUTAÇÃO PARA CRIAR A AVALIAÇÃO
   const { mutate: submitReview, isPending: isSubmittingReview } = useMutation({
-    // A mutationFn agora espera um objeto que inclui todos os dados necessários
-    mutationFn: (data: { providerId: string; rating: number; comment: string }) => 
-      createReview(data.providerId, data.rating, data.comment),
-    
+    mutationFn: createReview,
     onSuccess: () => {
       addToast('Avaliação enviada com sucesso!', 'success');
-      // Invalida o cache de avaliações para forçar uma nova busca dos dados
       queryClient.invalidateQueries({ queryKey: ['reviews', providerId] });
+      setNewRating(0);
+      setNewComment('');
     },
     onError: (error) => {
       addToast(`Erro ao enviar avaliação: ${error.message}`, 'error');
     }
   });
 
-  // A função que chama a mutação agora passa o providerId junto
-  const handleReviewSubmit = (event: React.FormEvent<HTMLFormElement> & { target: { rating: { value: string }, comment: { value: string } } }) => {
+  const handleReviewSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    const rating = parseInt(event.target.rating.value, 10);
-    const comment = event.target.comment.value;
-    
-    if (providerId && rating > 0 && comment.trim()) {
-      submitReview({ providerId, rating, comment }); // Passa todos os dados necessários
+    const servicoId = provider?.servicos?.[0]?.id;
+
+    if (servicoId && newRating > 0 && newComment.trim()) {
+      submitReview({ servicoId, nota: newRating, comentario: newComment });
     } else {
-      addToast('Por favor, dê uma nota e escreva um comentário.', 'error');
+      let errorMessage = 'Por favor, dê uma nota e escreva um comentário.';
+      if (!servicoId) {
+        errorMessage = 'Não foi possível identificar um serviço para avaliar.';
+      }
+      addToast(errorMessage, 'error');
     }
   };
 
-  
+  if (isLoadingProvider) {
+    return <ProfilePageSkeleton />;
+  }
+
+  if (isError || !provider) {
+    return (
+      <div className="text-center py-10">
+        <h1>Erro</h1>
+        <p>Prestador não encontrado.</p>
+        <Link to={APP_ROUTES.HOME}>
+          <Button>Voltar</Button>
+        </Link>
+      </div>
+    );
+  }
+
   return (
-    <div className="container mx-auto px-2 py-8">
-      {/* SEU JSX PARA EXIBIR O PERFIL DO PRESTADOR VAI AQUI */}
-      {/* Exemplo: */}
+    <div>
+      {/* Aqui vai o seu JSX para exibir o perfil completo do 'provider' */}
       <h1 className="text-4xl font-bold">{provider.name}</h1>
       <p>{provider.profession?.name}</p>
-
-      {/* SEÇÃO DE AVALIAÇÕES */}
+      
       <section className="mt-8">
         <h2 className="text-2xl font-semibold mb-4">Avaliações</h2>
         {isLoadingReviews ? (
@@ -85,11 +97,21 @@ const ProviderProfilePage: React.FC = () => {
           reviews?.map(review => <ReviewCard key={review.id} review={review} />)
         )}
 
-        {/* FORMULÁRIO DE NOVA AVALIAÇÃO (adaptado do seu código) */}
+        {/* Formulário de Nova Avaliação (Corrigido) */}
         <form onSubmit={handleReviewSubmit} className="mt-6 p-4 border-t">
           <h3 className="font-bold mb-2">Deixe sua avaliação</h3>
-          <StarRating rating={0} onRate={() => {}} size={28} name="rating" />
-          <Textarea name="comment" label="Seu comentário:" rows={3} required />
+          <div className="mb-3">
+            <StarRating rating={newRating} onRate={setNewRating} size={28} />
+          </div>
+          <Textarea
+            label="Seu comentário:"
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            rows={3}
+            required
+            placeholder="Descreva sua experiência..."
+            disabled={isSubmittingReview}
+          />
           <Button type="submit" isLoading={isSubmittingReview} className="mt-2">
             {isSubmittingReview ? 'Enviando...' : 'Enviar Avaliação'}
           </Button>
