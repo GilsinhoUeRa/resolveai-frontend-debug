@@ -12,9 +12,9 @@ const Footer: React.FC = () => {
         <p className="text-xs">&copy; {new Date().getFullYear()} {APP_NAME}. Todos os direitos reservados.</p>
         <div className="mt-4 flex justify-center space-x-4">
           {/* Placeholder for social media icons */}
-          <a href="#" className="text-cinza-neutro hover:text-orange-energia transition-colors">Facebook</a>
-          <a href="#" className="text-cinza-neutro hover:text-orange-energia transition-colors">Instagram</a>
-          <a href="#" className="text-cinza-neutro hover:text-orange-energia transition-colors">LinkedIn</a>
+          <a href="https://www.instagram.com/gilsinhojointech/" className="text-cinza-neutro hover:text-orange-energia transition-colors">Facebook</a>
+          <a href="https://www.instagram.com/jointechsistemas" className="text-cinza-neutro hover:text-orange-energia transition-colors">Instagram</a>
+          <a href="https://www.instagram.com/gilsinhojointech/" className="text-cinza-neutro hover:text-orange-energia transition-colors">LinkedIn</a>
         </div>
         <div className="mt-4 text-xs">
           <Link to={APP_ROUTES.TERMS_OF_SERVICE} className="text-cinza-neutro hover:text-orange-energia transition-colors px-2">

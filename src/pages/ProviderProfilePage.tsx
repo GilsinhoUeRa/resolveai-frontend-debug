@@ -1,124 +1,143 @@
-// src/pages/ProviderProfilePage.tsx (Versão Final Corrigida)
+// src/pages/ProviderProfilePage.tsx (Versão Final e Completa)
 
-import React, { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import React, { FormEvent, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getProviderById, getReviewsByProvider, createReview } from '@/services/api';
-import { Review as ReviewType, ProviderDetails } from '@/types';
-import StarRating from '@/components/StarRating';
-import ReviewCard from '@/components/ReviewCard';
-import Button from '@/components/Button';
-import Textarea from '@/components/Textarea';
-import ProfilePageSkeleton from '@/components/skeletons/ProfilePageSkeleton';
+
+// Importações corretas dos Módulos de API
+import { getProviderByIdApi } from '@/services/user.api'; 
+import { getReviewsByProviderApi, createReviewApi } from '@/services/reviews.api';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/useToast';
-import { APP_ROUTES } from '@/constants';
+
+// Tipos e Componentes
+import { Review, ProviderDetails, NovaAvaliacaoPayload } from '@/types';
+import ReviewCard from '@/components/ReviewCard';
+import ProfilePageSkeleton from '@/components/skeletons/ProfilePageSkeleton';
+import Button from '@/components/Button';
+import Textarea from '@/components/Textarea';
+import StarRating from '@/components/StarRating';
 
 const ProviderProfilePage: React.FC = () => {
-  const { providerId } = useParams<{ providerId: string }>();
-  const queryClient = useQueryClient();
-  const { addToast } = useToast();
-  const { user } = useAuth();
-  
-  // Estados para controlar os campos do formulário
-  const [newRating, setNewRating] = useState(0);
-  const [newComment, setNewComment] = useState('');
+    const { providerId } = useParams<{ providerId: string }>();
+    const queryClient = useQueryClient();
+    const { addToast } = useToast();
+    const { user } = useAuth();
 
-  // BUSCANDO DADOS DO PRESTADOR
-  const { data: provider, isLoading: isLoadingProvider, isError } = useQuery<ProviderDetails, Error>({
-    queryKey: ['provider', providerId],
-    queryFn: () => getProviderById(providerId!),
-    enabled: !!providerId,
-  });
+    // Estado local apenas para o formulário de nova avaliação
+    const [newReviewRating, setNewReviewRating] = useState(0);
+    const [newReviewComment, setNewReviewComment] = useState('');
 
-  // BUSCANDO AS AVALIAÇÕES
-  const { data: reviews, isLoading: isLoadingReviews } = useQuery<ReviewType[], Error>({
-    queryKey: ['reviews', providerId],
-    queryFn: () => getReviewsByProvider(providerId!),
-    enabled: !!provider, // Só busca as avaliações depois que os dados do prestador chegarem
-  });
+    // Query para buscar os dados do prestador
+    const { data: provider, isLoading: isLoadingProvider, isError: isProviderError } = useQuery<ProviderDetails>({
+        queryKey: ['provider', providerId],
+        queryFn: () => getProviderByIdApi(providerId!),
+        enabled: !!providerId,
+    });
 
-  // CONFIGURANDO A MUTAÇÃO PARA CRIAR A AVALIAÇÃO
-  const { mutate: submitReview, isPending: isSubmittingReview } = useMutation({
-    mutationFn: createReview,
-    onSuccess: () => {
-      addToast('Avaliação enviada com sucesso!', 'success');
-      queryClient.invalidateQueries({ queryKey: ['reviews', providerId] });
-      setNewRating(0);
-      setNewComment('');
-    },
-    onError: (error) => {
-      addToast(`Erro ao enviar avaliação: ${error.message}`, 'error');
-    }
-  });
+    // Query para buscar as avaliações deste prestador
+    const { data: reviews = [], isLoading: isLoadingReviews } = useQuery<Review[]>({
+        queryKey: ['reviews', providerId],
+        queryFn: () => getReviewsByProviderApi(providerId!),
+        enabled: !!provider,
+    });
 
-  const handleReviewSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-    const servicoId = provider?.servicos?.[0]?.id;
+    // Mutação para criar uma nova avaliação
+    const { mutate: submitReview, isPending: isSubmittingReview } = useMutation({
+        mutationFn: createReviewApi,
+        onSuccess: () => {
+            addToast('Avaliação enviada com sucesso!', 'success');
+            queryClient.invalidateQueries({ queryKey: ['reviews', providerId] });
+            // Limpa o formulário após o sucesso
+            setNewReviewRating(0);
+            setNewReviewComment('');
+        },
+        onError: (error: any) => {
+            addToast(error.response?.data?.erro || 'Erro ao enviar avaliação.', 'error');
+        },
+    });
 
-    if (servicoId && newRating > 0 && newComment.trim()) {
-      submitReview({ servicoId, nota: newRating, comentario: newComment });
-    } else {
-      let errorMessage = 'Por favor, dê uma nota e escreva um comentário.';
-      if (!servicoId) {
-        errorMessage = 'Não foi possível identificar um serviço para avaliar.';
-      }
-      addToast(errorMessage, 'error');
-    }
-  };
+    const handleReviewSubmit = (e: FormEvent) => {
+        e.preventDefault();
+        if (newReviewRating === 0 || !newReviewComment.trim()) {
+            addToast('Por favor, selecione uma nota e escreva um comentário.', 'error');
+            return;
+        }
+        // Assumindo que a avaliação está ligada ao prestador e não a um serviço específico por agora
+        // Para uma lógica mais complexa, você passaria um 'servicoId' aqui
+        const reviewData: NovaAvaliacaoPayload = { nota: newReviewRating, comentario: newReviewComment };
+        submitReview({ providerId: providerId!, reviewData });
+    };
+    
+    if (isLoadingProvider) return <ProfilePageSkeleton />;
+    if (isProviderError || !provider) return <div className="text-center py-10">Erro: Prestador não encontrado.</div>;
 
-  if (isLoadingProvider) {
-    return <ProfilePageSkeleton />;
-  }
+    const placeholderPhotoUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(provider.name)}&background=f57c00&color=fff&size=128`;
 
-  if (isError || !provider) {
     return (
-      <div className="text-center py-10">
-        <h1>Erro</h1>
-        <p>Prestador não encontrado.</p>
-        <Link to={APP_ROUTES.HOME}>
-          <Button>Voltar</Button>
-        </Link>
-      </div>
+        <div className="container mx-auto px-4 py-8">
+            <div className="bg-white rounded-lg shadow-xl p-6 md:p-8">
+                {/* Header do Perfil */}
+                <div className="flex flex-col md:flex-row items-center md:items-start text-center md:text-left">
+                    <img
+                        src={provider.photoUrl || placeholderPhotoUrl}
+                        alt={provider.name}
+                        className="w-32 h-32 rounded-full object-cover mb-4 md:mb-0 md:mr-8 border-4 border-white shadow-md"
+                    />
+                    <div className="flex-grow">
+                        <h1 className="text-3xl font-bold text-grafite-profundo">{provider.name}</h1>
+                        <p className="text-lg text-orange-energia font-semibold">{provider.profession?.name}</p>
+                        <p className="text-md text-cinza-neutro mt-1">{provider.city}, {provider.uf}</p>
+                    </div>
+                    {/* Botão de Contato/Chat viria aqui */}
+                </div>
+
+                {/* Biografia */}
+                <section className="mt-8 border-t pt-6">
+                    <h2 className="text-xl font-semibold text-grafite-profundo mb-3">Sobre Mim</h2>
+                    <p className="text-grafite-profundo leading-relaxed">{provider.bio || 'Este prestador ainda não adicionou uma biografia.'}</p>
+                </section>
+                
+                {/* Seção de Avaliações */}
+                <section className="mt-8 border-t pt-6">
+                    <h2 className="text-xl font-semibold text-grafite-profundo mb-4">Avaliações ({reviews.length})</h2>
+                    {isLoadingReviews ? (
+                        <p>A carregar avaliações...</p>
+                    ) : reviews.length > 0 ? (
+                        <div className="space-y-6">
+                            {reviews.map(review => <ReviewCard key={review.id} review={review} />)}
+                        </div>
+                    ) : (
+                        <p className="text-cinza-neutro">Este prestador ainda não possui avaliações.</p>
+                    )}
+                </section>
+
+                {/* Formulário para Adicionar Avaliação (só aparece para clientes logados) */}
+                {user && user.role === 'CLIENTE' && (
+                     <section className="mt-8 border-t pt-6">
+                        <h2 className="text-xl font-semibold text-grafite-profundo mb-4">Deixe a sua Avaliação</h2>
+                        <form onSubmit={handleReviewSubmit} className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium mb-1">A sua nota</label>
+                                <StarRating rating={newReviewRating} onRate={setNewReviewRating} size={32} />
+                            </div>
+                            <Textarea
+                                label="O seu comentário"
+                                value={newReviewComment}
+                                onChange={(e) => setNewReviewComment(e.target.value)}
+                                placeholder="Descreva a sua experiência com este prestador..."
+                                required
+                                rows={4}
+                            />
+                            <Button type="submit" isLoading={isSubmittingReview}>
+                                {isSubmittingReview ? 'A enviar...' : 'Enviar Avaliação'}
+                            </Button>
+                        </form>
+                    </section>
+                )}
+            </div>
+        </div>
     );
-  }
-
-  return (
-    <div>
-      {/* Aqui vai o seu JSX para exibir o perfil completo do 'provider' */}
-      <h1 className="text-4xl font-bold">{provider.name}</h1>
-      <p>{provider.profession?.name}</p>
-      
-      <section className="mt-8">
-        <h2 className="text-2xl font-semibold mb-4">Avaliações</h2>
-        {isLoadingReviews ? (
-          <p>Carregando avaliações...</p>
-        ) : (
-          reviews?.map(review => <ReviewCard key={review.id} review={review} />)
-        )}
-
-        {/* Formulário de Nova Avaliação (Corrigido) */}
-        <form onSubmit={handleReviewSubmit} className="mt-6 p-4 border-t">
-          <h3 className="font-bold mb-2">Deixe sua avaliação</h3>
-          <div className="mb-3">
-            <StarRating rating={newRating} onRate={setNewRating} size={28} />
-          </div>
-          <Textarea
-            label="Seu comentário:"
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            rows={3}
-            required
-            placeholder="Descreva sua experiência..."
-            disabled={isSubmittingReview}
-          />
-          <Button type="submit" isLoading={isSubmittingReview} className="mt-2">
-            {isSubmittingReview ? 'Enviando...' : 'Enviar Avaliação'}
-          </Button>
-        </form>
-      </section>
-    </div>
-  );
 };
 
 export default ProviderProfilePage;

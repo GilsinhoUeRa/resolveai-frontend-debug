@@ -87,13 +87,7 @@ const MainAppLayout: React.FC = () => {
 // --- COMPONENTE PRINCIPAL DA APLICAÇÃO ---
 // A responsabilidade dele é apenas gerenciar as rotas.
 const App: React.FC = () => {
-  const { user, checkAndUpdateSubscriptionStatus } = useAuth();
-
-  useEffect(() => {
-    if (user) {
-      checkAndUpdateSubscriptionStatus();
-    }
-  }, [user, checkAndUpdateSubscriptionStatus]);
+  const { user } = useAuth();
 
   return (
     <HashRouter>

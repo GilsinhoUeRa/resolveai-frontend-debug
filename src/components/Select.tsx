@@ -1,29 +1,33 @@
+// src/components/Select.tsx
 import React from 'react';
 
+// A interface para cada opção no select
 interface SelectOption {
   value: string | number;
   label: string;
 }
 
+// As propriedades que o nosso componente Select aceita
 interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
   error?: string;
-  options: SelectOption[];
+  options?: SelectOption[]; // A propriedade options agora é opcional para lidar com o estado de carregamento
   containerClassName?: string;
-  placeholder?: string; // Added placeholder as an explicit prop
+  placeholder?: string;
 }
 
 const Select: React.FC<SelectProps> = ({
   label,
   name,
   error,
-  options,
+  options, // A lista de opções pode ser indefinida inicialmente
   className = '',
   containerClassName = '',
-  placeholder, // Destructured placeholder
-  ...restProps // Renamed to restProps to avoid confusion
+  placeholder,
+  ...restProps
 }) => {
   const selectId = name || restProps.id || `select-${Math.random().toString(36).substr(2, 9)}`;
+
   return (
     <div className={`mb-4 ${containerClassName}`}>
       {label && (
@@ -39,10 +43,16 @@ const Select: React.FC<SelectProps> = ({
             ? 'border-red-500 focus:ring-red-400'
             : 'border-cinza-neutro focus:ring-orange-energia focus:border-orange-energia'
         } ${className}`}
-        {...restProps} // Spread the rest of the HTML select attributes
+        {...restProps}
       >
-        {placeholder && <option value="">{placeholder}</option>} {/* Use the destructured placeholder */}
-        {options.map(option => (
+        {placeholder && <option value="">{placeholder}</option>}
+        
+        {/* --- CORREÇÃO APLICADA AQUI --- */}
+        {/*
+          Verificamos se 'options' é de facto um array antes de tentar chamar a função .map().
+          Isto previne o erro quando o componente renderiza antes dos dados da API chegarem.
+        */}
+        {Array.isArray(options) && options.map(option => (
           <option key={option.value} value={option.value}>
             {option.label}
           </option>

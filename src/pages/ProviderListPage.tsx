@@ -2,55 +2,70 @@
 
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-
-// 1. Importamos nossa nova função de API
-import { getServices } from '@/services/api';
-
-// Seus componentes de UI
-import ProviderCard from '@/components/ProviderCard';
+import { getServicosApi } from '@/services/services.api';
 import ProviderCardSkeleton from '@/components/skeletons/ProviderCardSkeleton';
+import ProviderCard from '@/components/ProviderCard'; // Importe seu componente de card
 
 const ProviderListPage: React.FC = () => {
-
-  // 2. Substituímos useState e useEffect por uma única chamada ao useQuery.
-  // Ele gerencia o loading, erros e os dados para nós.
+  // 1. O hook useQuery substitui useState, useEffect e a chamada manual da API.
   const { 
-    data: services, // renomeamos 'data' para 'services' para clareza
+    data: servicos, 
     isLoading, 
     isError, 
     error 
-  } = useQuery({
-    queryKey: ['services'], // Chave única para esta busca de dados
-    queryFn: getServices,  // A função que será executada para buscar os dados
+  } = useQuery<Servico[], Error>({
+    queryKey: ['servicos'], // Uma chave única para esta busca de dados
+    queryFn: getServicosApi,   // A função que realmente busca os dados (deve retornar uma promessa)
   });
 
-  // 3. Renderizamos o esqueleto de carregamento
+  // 2. O componente reage aos estados fornecidos pelo hook.
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[...Array(6)].map((_, i) => <ProviderCardSkeleton key={i} />)}
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-8">Buscando Prestadores...</h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(6)].map((_, i) => <ProviderCardSkeleton key={i} />)}
+        </div>
       </div>
     );
   }
 
-  // 4. Renderizamos uma mensagem de erro se a busca falhar
   if (isError) {
-    return <p className="text-red-500">Erro ao buscar prestadores: {error.message}</p>;
+    return (
+      <div className="text-center py-10">
+        <h2 className="text-xl text-red-600">Ocorreu um erro ao buscar os dados.</h2>
+        <p className="text-cinza-neutro">{error.message}</p>
+      </div>
+    );
   }
 
-  // 5. Renderizamos os dados quando a busca for bem-sucedida
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-8 text-grafite-profundo">Encontre o Profissional Ideal</h1>
+    <div className="container mx-auto px-4 py-8">
+      <header className="mb-8">
+        <h1 className="text-3xl font-bold">Encontre Prestadores de Serviço</h1>
+        <p className="text-lg text-cinza-neutro">Os melhores profissionais para resolver o que você precisa.</p>
+      </header>
 
-      {services && services.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-1 gap-6"> {/* Ajustado para 1 coluna */}
-          {services.map(service => (
-            <ProviderCard key={service.id} provider={service} />
+      {servicos && servicos.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Supondo que você queira exibir os prestadores (usuários) e não os serviços */}
+          {/* Se 'getServicosApi' retorna prestadores, o código abaixo funciona. */}
+          {/* Se retorna serviços, você precisará adaptar para mostrar o card do serviço. */}
+          {/* Vou assumir que são prestadores para o exemplo do ProviderCard */}
+          {/* {servicos.map(provider => (
+            <ProviderCard key={provider.id} provider={provider} />
+          ))} */}
+
+          {/* Se 'getServicos' retorna a lista de serviços: */}
+           {servicos.map(servico => (
+            <div key={servico.id} className="p-4 bg-white rounded-lg shadow">
+              <h3 className="font-bold text-lg">{servico.nome}</h3>
+              <p className="text-sm text-cinza-neutro">{servico.descricao}</p>
+            </div>
           ))}
         </div>
       ) : (
-        <p>Nenhum prestador de serviço encontrado no momento.</p>
+        <p className="text-center py-10">Nenhum serviço ou prestador encontrado.</p>
       )}
     </div>
   );

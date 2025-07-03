@@ -111,7 +111,7 @@ const ContactUsPage: React.FC = () => {
                 <strong>E-mail:</strong> <a href="mailto:contato@resolveai.com" className="text-orange-energia hover:underline">contato@resolveai.com</a>
             </p>
             <p className="text-cinza-neutro">
-                <strong>Telefone (Suporte):</strong> (XX) XXXX-XXXX (Seg-Sex, 9h-18h)
+                <strong>Telefone (Suporte):</strong> (77) 99999-9999 (Seg-Sex, 9h-18h)
             </p>
         </div>
       </div>

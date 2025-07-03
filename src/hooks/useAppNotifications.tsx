@@ -1,8 +1,9 @@
+// src/hooks/useAppNotifications.tsx
+
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { AppNotification, AppNotificationContextType, ChatSession } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
 // import { useChat } from './useChat'; // Temporariamente comentado, pois notificações virão da API
-// import { getMockUserDetails } from './useChat'; // Temporariamente comentado
 
 const APP_NOTIFICATIONS_STORAGE_KEY = 'resolveai_app_notifications_v2'; // Mudado para evitar conflito
 
@@ -53,7 +54,6 @@ export const AppNotificationProvider: React.FC<{ children: ReactNode }> = ({ chi
         const unreadCountForCurrentUser = session.unreadCountByParticipant?.[currentUser.id] || 0;
         if (unreadCountForCurrentUser > 0 && session.lastMessage) {
           // const otherParticipantId = session.participantIds.find(id => id !== currentUser.id);
-          // const otherParticipant = otherParticipantId ? getMockUserDetails(otherParticipantId) : null; // getMockUserDetails precisaria ser importado
           const senderName = 'Alguém (Chat)'; // Simplificado
 
           derivedChatNotifications.push({

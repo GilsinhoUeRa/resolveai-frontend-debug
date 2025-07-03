@@ -1,84 +1,67 @@
+// src/hooks/useFavorites.tsx (Refatorado com TanStack Query)
 
-import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import React, { createContext, useContext, ReactNode } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAuth } from './useAuth';
+import { useToast } from './useToast';
 import { FavoritesContextType } from '@/types';
-import { useAuth } from '@/hooks/useAuth';
+import { getFavorites, addFavoriteApi, removeFavoriteApi } from '@/services/favorites.api'; // Caminho correto para o novo módulo
 
 const FavoritesContext = createContext<FavoritesContextType | undefined>(undefined);
 
-const FAVORITES_STORAGE_KEY_PREFIX = 'resolveai_favorites_'; // Mantido para persistência local temporária
-
 export const FavoritesProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const queryClient = useQueryClient();
   const { user } = useAuth();
-  const [favoriteProviderIds, setFavoriteProviderIds] = useState<string[]>([]);
-  const [loadingFavorites, setLoadingFavorites] = useState<boolean>(true);
+  const { addToast } = useToast();
 
-  const getStorageKey = useCallback(() => {
-    return user ? `${FAVORITES_STORAGE_KEY_PREFIX}${user.id}` : null;
-  }, [user]);
+  // 1. BUSCA (Query) a lista de IDs de favoritos da nossa nova API
+  const { data: favoriteProviderIds = [], isLoading: loadingFavorites } = useQuery<string[]>({
+    // A chave da query depende do ID do usuário para ser única
+    queryKey: ['favorites', user?.id],
+    queryFn: getFavorites,
+    // A query só será executada se houver um usuário logado
+    enabled: !!user,
+    staleTime: 1000 * 60 * 5, // Cache de 5 minutos
+  });
 
-  useEffect(() => {
-    setLoadingFavorites(true);
-    const storageKey = getStorageKey();
-    if (storageKey && user) {
-      // TODO: Substituir por chamada à API: fetch('/api/favorites')
-      // A API retornaria a lista de IDs de provedores favoritados pelo usuário.
-      try {
-        const storedFavorites = localStorage.getItem(storageKey);
-        if (storedFavorites) {
-          setFavoriteProviderIds(JSON.parse(storedFavorites));
-        } else {
-          setFavoriteProviderIds([]);
-        }
-      } catch (error) {
-        console.error("Error loading favorites from localStorage (mock):", error);
-        setFavoriteProviderIds([]);
-      }
-    } else {
-      setFavoriteProviderIds([]); 
-    }
-    setLoadingFavorites(false);
-  }, [user, getStorageKey]);
+  // 2. MUTAÇÃO para ADICIONAR um favorito
+  const addFavoriteMutation = useMutation({
+    mutationFn: addFavoriteApi,
+    onSuccess: () => {
+      // Invalida a query de favoritos para buscar a lista atualizada
+      queryClient.invalidateQueries({ queryKey: ['favorites', user?.id] });
+      addToast('Adicionado aos favoritos!', 'success');
+    },
+    onError: (error: any) => {
+      addToast(error.response?.data?.erro || 'Erro ao adicionar favorito.', 'error');
+    },
+  });
 
-  // TODO: Este useEffect de persistência será obsoleto. O backend cuidará disso.
-  useEffect(() => {
-    const storageKey = getStorageKey();
-    if (storageKey && !loadingFavorites) { 
-      try {
-        localStorage.setItem(storageKey, JSON.stringify(favoriteProviderIds));
-      } catch (error) {
-        console.error("Error saving favorites to localStorage (mock):", error);
-      }
-    }
-  }, [favoriteProviderIds, user, loadingFavorites, getStorageKey]);
+  // 3. MUTAÇÃO para REMOVER um favorito
+  const removeFavoriteMutation = useMutation({
+    mutationFn: removeFavoriteApi,
+    onSuccess: () => {
+      // Invalida a query para buscar a lista atualizada
+      queryClient.invalidateQueries({ queryKey: ['favorites', user?.id] });
+      addToast('Removido dos favoritos.', 'info');
+    },
+    onError: (error: any) => {
+      addToast(error.response?.data?.erro || 'Erro ao remover favorito.', 'error');
+    },
+  });
 
-  const addFavorite = useCallback(async (providerId: string) => {
-    // TODO: Substituir por chamada à API: fetch('/api/favorites', { method: 'POST', body: { providerId } })
-    // A API adicionaria o favorito e retornaria sucesso/erro.
-    setFavoriteProviderIds(prev => {
-      if (!prev.includes(providerId)) {
-        return [...prev, providerId];
-      }
-      return prev;
-    });
-    // Simula a resposta da API, idealmente o estado seria atualizado com base na resposta.
-  }, []);
+  // Função para verificar se um ID está na lista de favoritos
+  const isFavorite = (providerId: string) => favoriteProviderIds.includes(providerId);
 
-  const removeFavorite = useCallback(async (providerId: string) => {
-    // TODO: Substituir por chamada à API: fetch(`/api/favorites/${providerId}`, { method: 'DELETE' })
-    // A API removeria o favorito e retornaria sucesso/erro.
-    setFavoriteProviderIds(prev => prev.filter(id => id !== providerId));
-    // Simula a resposta da API.
-  }, []);
+  const value = {
+    favoriteProviderIds,
+    addFavorite: addFavoriteMutation.mutate,
+    removeFavorite: removeFavoriteMutation.mutate,
+    isFavorite,
+    loadingFavorites,
+  };
 
-  const isFavorite = useCallback((providerId: string): boolean => {
-    return favoriteProviderIds.includes(providerId);
-  }, [favoriteProviderIds]);
-
-  return (
-    <FavoritesContext.Provider value={{ favoriteProviderIds, addFavorite, removeFavorite, isFavorite, loadingFavorites }}>
-      {children}
-    </FavoritesContext.Provider>
-  );
+  return <FavoritesContext.Provider value={value}>{children}</FavoritesContext.Provider>;
 };
 
 export const useFavorites = (): FavoritesContextType => {

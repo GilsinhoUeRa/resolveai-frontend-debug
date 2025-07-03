@@ -45,8 +45,6 @@ export const MOCK_PROVIDERS_DETAILS_DATA: ProviderDetails[] = [
 
 // Dados mock para avaliações, anteriormente em ProviderProfilePage.tsx e MyReviewsPage.tsx
 // Um mock global para reviews pode ser armazenado no localStorage para simular persistência entre sessões de desenvolvimento.
-// Exemplo: localStorage.setItem('resolveai_mock_reviews', JSON.stringify(MOCK_REVIEWS_INITIAL_DATA));
-// E carregado: const storedReviews = localStorage.getItem('resolveai_mock_reviews');
 // MOCK_REVIEWS agora pode ser apenas um conjunto inicial ou ser gerenciado de forma mais dinâmica para testes.
 export const MOCK_REVIEWS: Review[] = [
   { id: 'review1', clientId: 'client1', clientName: 'João Fulano', providerId: 'provider1_static_fallback', rating: 5, comment: 'Excelente profissional! Resolveu meu problema rapidamente.', date: new Date(Date.now() - 86400000 * 2).toISOString() },
@@ -59,6 +57,4 @@ export const MOCK_REVIEWS: Review[] = [
   { id: 'review_last_week_user1', clientId: 'currentUserClient1', clientName: 'João Fulano Logado', providerId: 'provider3_static_fallback', rating: 5, comment: 'Mariana desenvolveu meu e-commerce com maestria! Entregou antes do prazo e com qualidade excepcional. Recomendo demais!', date: new Date(Date.now() - 86400000 * 7).toISOString(), clientPhotoUrl:'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100' },
 ];
 // Para inicializar o localStorage com os mocks de reviews (opcional, apenas para desenvolvimento):
-// if (!localStorage.getItem('resolveai_mock_reviews')) {
-//  localStorage.setItem('resolveai_mock_reviews', JSON.stringify(MOCK_REVIEWS));
 // }
