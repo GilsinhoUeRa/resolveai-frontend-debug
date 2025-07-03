@@ -8,7 +8,7 @@ import CheckShieldIcon from '@/components/icons/CheckShieldIcon';
 import SparkleIcon from '@/components/icons/SparkleIcon';
 import HeartIcon from '@/components/icons/HeartIcon'; 
 import { useFavorites } from '@/hooks/useFavorites'; 
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/hooks/useAuthHook';
 
 interface ProviderCardProps {
   provider: ProviderDetails; 

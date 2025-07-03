@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { APP_ROUTES } from '@/constants';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/hooks/useAuthHook';
 import { UserType } from '@/types';
 import HomeIcon from '@/components/icons/HomeIcon';
 import SearchIcon from '@/components/icons/SearchIcon';

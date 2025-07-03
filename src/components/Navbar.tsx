@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Logo from '@/components/Logo';
 import { APP_NAME, APP_ROUTES, COLORS } from '@/constants';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/hooks/useAuthHook';
 import Button from '@/components/Button';
 import BellIcon from '@/components/icons/BellIcon';
 import NotificationDropdown from '@/components/NotificationDropdown';

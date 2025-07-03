@@ -5,7 +5,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import BottomNavbar from '@/components/BottomNavbar';
 import ToastContainer from '@/components/ToastContainer';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/hooks/useAuthHook';
 
 const MainLayout: React.FC = () => {
   const { user } = useAuth();

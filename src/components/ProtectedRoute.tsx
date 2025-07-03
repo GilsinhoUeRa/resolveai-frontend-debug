@@ -1,15 +1,16 @@
-// src/components/ProtectedRoute.tsx
+// src/components/ProtectedRoute.tsx (Versão Corrigida)
+
 import React from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/hooks/useAuthHook'; // <-- CORREÇÃO APLICADA AQUI
 import { APP_ROUTES } from '@/constants';
 
 interface ProtectedRouteProps {
-  allowedRoles?: string[]; // Ex: ['ADMIN', 'PRESTADOR']
+  allowedRoles?: string[];
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles }) => {
-  const { user, loading, token, isAdmin } = useAuth();
+  const { user, loading, token, isAdmin } = useAuth(); // Esta linha agora funcionará corretamente
   const location = useLocation();
 
   if (loading) {
@@ -24,16 +25,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles }) => {
     return <Navigate to={APP_ROUTES.LOGIN} state={{ from: location }} replace />;
   }
 
-  // Se a rota exige um papel específico e o utilizador não o tem...
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    // ...redireciona para a home, ou para uma página "Não Autorizado".
     return <Navigate to={APP_ROUTES.HOME} replace />;
   }
+  
+  if (isAdmin) return <Outlet />;
 
-  // Se for admin, tem acesso a tudo
-  if(isAdmin) return <Outlet />;
-
-  // Se passou por todas as verificações, renderiza a página solicitada.
   return <Outlet />;
 };
 

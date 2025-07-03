@@ -3,7 +3,7 @@ import React from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'; // Adicionado useNavigate
 import Logo from '@/components/Logo';
 import { APP_NAME, APP_ROUTES} from '@/constants';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/hooks/useAuthHook';
 import Button from '@/components/Button';
 import HomeIcon from '@/components/icons/HomeIcon';
 import ListChecksIcon from '@/components/icons/ListChecksIcon'; 

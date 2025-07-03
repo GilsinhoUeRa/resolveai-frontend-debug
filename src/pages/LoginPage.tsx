@@ -6,7 +6,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Input from '@/components/Input';
 import Button from '@/components/Button';
 import Logo from '@/components/Logo';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/hooks/useAuthHook';
 import { useToast } from '@/hooks/useToast';
 import { APP_ROUTES, APP_NAME } from '@/constants';
 

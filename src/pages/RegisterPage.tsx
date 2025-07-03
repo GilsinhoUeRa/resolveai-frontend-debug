@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/hooks/useAuthHook';
 import { useToast } from '@/hooks/useToast';
 import { useViaCEP } from '@/hooks/useViaCEP';
 import { registerSchema, RegisterFormData } from '@/validators/auth.schema';

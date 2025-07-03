@@ -1,21 +1,20 @@
-// src/pages/admin/AdminDashboardPage.tsx (Versão Final Corrigida)
+// src/pages/admin/AdminDashboardPage.tsx (Versão Corrigida)
+
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { getDashboardStatsApi } from '@/services/admin.api';
-
-// Componentes e Ícones
+import { useAuth } from '@/hooks/useAuthHook'; // <-- CORREÇÃO APLICADA AQUI
 import StatCard from '@/components/admin/StatCard';
 import Card from '@/components/Card';
 import { APP_NAME, APP_ROUTES } from '@/constants';
-import { useAuth } from '@/hooks/useAuth';
 import UsersIcon from '@/components/icons/UsersIcon';
 import ListChecksIcon from '@/components/icons/ListChecksIcon';
 import SparkleIcon from '@/components/icons/SparkleIcon';
 import LayoutGridIcon from '@/components/icons/LayoutGridIcon';
 
 const AdminDashboardPage: React.FC = () => {
-    const { user } = useAuth();
+    const { user } = useAuth(); // Esta linha agora funcionará corretamente
     const navigate = useNavigate();
 
     const { data: stats, isLoading } = useQuery({
@@ -26,7 +25,7 @@ const AdminDashboardPage: React.FC = () => {
     const iconSize = 24;
 
     if (isLoading || !stats) {
-        return <div>Carregando estatísticas...</div>;
+        return <div>A carregar estatísticas...</div>;
     }
 
     return (
@@ -40,7 +39,7 @@ const AdminDashboardPage: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-10">
                 <StatCard 
-                    title="Total de Usuários" 
+                    title="Total de Utilizadores" 
                     value={stats.totalUsers} 
                     icon={<UsersIcon size={iconSize} />} 
                     iconBgColor="bg-blue-500"
@@ -79,7 +78,7 @@ const AdminDashboardPage: React.FC = () => {
             <Card className="bg-orange-energia text-white">
                 <h2 className="text-xl font-semibold mb-3">Dica do Administrador</h2>
                 <p className="text-sm opacity-90">
-                    Mantenha os dados da plataforma sempre atualizados para garantir a melhor experiência para seus usuários.
+                    Mantenha os dados da plataforma sempre atualizados para garantir a melhor experiência para os seus utilizadores.
                 </p>
             </Card>
         </div>
