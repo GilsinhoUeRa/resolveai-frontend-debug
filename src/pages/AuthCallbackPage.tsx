@@ -7,24 +7,19 @@ import { APP_ROUTES } from '@/constants';
 const AuthCallbackPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { setToken } = useAuth();
+  const { setToken } = useAuth(); // Assumindo que você expôs 'setToken' no seu AuthContext
 
   useEffect(() => {
-    // 1. Extrai o token do parâmetro da URL
     const token = searchParams.get('token');
-
     if (token) {
-      // 2. Guarda o token no estado global (que o guardará no localStorage)
-      setToken(token);
-      // 3. Redireciona o utilizador para a página principal da aplicação
-      navigate(APP_ROUTES.HOME, { replace: true });
+      setToken(token); // Guarda o token
+      navigate(APP_ROUTES.HOME, { replace: true }); // Redireciona para a home
     } else {
-      // Se não houver token, redireciona para a página de login com um erro
-      navigate(`${APP_ROUTES.LOGIN}?error=auth_failed`, { replace: true });
+      // Se não houver token, redireciona para o login com um erro
+      navigate(APP_ROUTES.LOGIN, { replace: true });
     }
-  }, [searchParams, setToken, navigate]);
+  }, [searchParams, navigate, setToken]);
 
-  // Renderiza uma mensagem de "a carregar" enquanto o processo acontece
   return (
     <div className="flex items-center justify-center min-h-screen">
       <p className="text-xl">A autenticar...</p>
