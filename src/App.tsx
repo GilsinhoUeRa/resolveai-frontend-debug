@@ -16,9 +16,8 @@ import MyReviewsPage from '@/pages/MyReviewsPage';
 import ChatListPage from '@/pages/ChatListPage';
 import ChatConversationPage from '@/pages/ChatConversationPage';
 import MyFavoritesPage from '@/pages/MyFavoritesPage';
-import AuthCallbackPage from '@/pages/AuthCallbackPage';
 import NotFoundPage from '@/pages/NotFoundPage';
-// ... e outras páginas como Termos, Privacidade, etc.
+import AuthCallbackPage from '@/pages/AuthCallbackPage'; // Importa a nova página de callback
 
 // Importações das páginas e layout de Admin
 import AdminLayout from '@/components/admin/AdminLayout';
@@ -36,6 +35,7 @@ import ToastContainer from '@/components/ToastContainer';
 import { APP_ROUTES } from '@/constants';
 
 // --- COMPONENTES DE PROTEÇÃO DE ROTA ---
+// Garante que apenas utilizadores autenticados possam aceder a certas páginas.
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth();
   const location = useLocation();
@@ -49,6 +49,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
   return <>{children}</>;
 };
 
+// Garante que apenas utilizadores com a role 'ADMIN' possam aceder às páginas de administração.
 const AdminProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, isAdmin, loading } = useAuth();
 
@@ -62,6 +63,7 @@ const AdminProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children
 };
 
 // --- COMPONENTE DE LAYOUT PRINCIPAL ---
+// Define a estrutura visual padrão da aplicação (Navbar, Footer, etc.).
 const MainAppLayout: React.FC = () => {
   const { user } = useAuth();
   return (
@@ -69,7 +71,7 @@ const MainAppLayout: React.FC = () => {
       <Navbar />
       <ToastContainer />
       <main className={`flex-grow container mx-auto px-4 py-8 ${user ? 'pb-24 md:pb-8' : 'pb-8'}`}>
-        <Outlet />
+        <Outlet /> {/* As páginas filhas serão renderizadas aqui */}
       </main>
       {user && <BottomNavbar />}
       <Footer />
@@ -82,15 +84,17 @@ const App: React.FC = () => {
   return (
     <HashRouter>
       <Routes>
-        {/* Rotas com o Layout Principal */}
+        {/* Rotas que utilizam o Layout Principal */}
         <Route element={<MainAppLayout />}>
           {/* Rotas Públicas */}
           <Route path={APP_ROUTES.WELCOME} element={<WelcomePage />} />
           <Route path={APP_ROUTES.LOGIN} element={<LoginPage />} />
           <Route path={APP_ROUTES.REGISTER} element={<RegisterPage />} />
+          
+          {/* Rota de Callback para a autenticação com Google */}
           <Route path="/auth/callback" element={<AuthCallbackPage />} />
           
-          {/* Rotas Protegidas */}
+          {/* Rotas Protegidas (exigem login) */}
           <Route path={APP_ROUTES.HOME} element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
           <Route path={APP_ROUTES.PROVIDERS} element={<ProtectedRoute><ProviderListPage /></ProtectedRoute>} />
           <Route path={`${APP_ROUTES.PROVIDER_PROFILE}/:providerId`} element={<ProtectedRoute><ProviderProfilePage /></ProtectedRoute>} />
@@ -101,10 +105,11 @@ const App: React.FC = () => {
           <Route path={`${APP_ROUTES.CHAT_CONVERSATION}/:chatId`} element={<ProtectedRoute><ChatConversationPage /></ProtectedRoute>} />
           <Route path={APP_ROUTES.MY_FAVORITES} element={<ProtectedRoute><MyFavoritesPage /></ProtectedRoute>} />
           
+          {/* Rota para páginas não encontradas */}
           <Route path="*" element={<NotFoundPage />} />
         </Route>
 
-        {/* Rotas de Admin com Layout de Admin */}
+        {/* Rotas de Admin (utilizam um layout e proteção específicos) */}
         <Route path="/admin" element={<AdminProtectedRoute><AdminLayout /></AdminProtectedRoute>}>
           <Route index element={<Navigate to={APP_ROUTES.ADMIN_DASHBOARD} replace />} />
           <Route path="dashboard" element={<AdminDashboardPage />} />
