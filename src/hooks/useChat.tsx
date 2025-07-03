@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAuth } from './useAuth';
+import { useAuth } from './useAuthHook';
 import { getChatSessionsApi, sendMessageApi, startOrGetChatSessionApi } from '@/services/chat.api'; // Caminho correto para o novo módulo
 import { ChatContextType, ChatSession } from '@/types';
 
