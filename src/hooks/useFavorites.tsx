@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAuth } from './useAuth';
+import { useAuth } from './useAuthHook';
 import { useToast } from './useToast';
 import { FavoritesContextType } from '@/types';
 import { getFavorites, addFavoriteApi, removeFavoriteApi } from '@/services/favorites.api'; // Caminho correto para o novo módulo
