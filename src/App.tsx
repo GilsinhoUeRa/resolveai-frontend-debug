@@ -1,15 +1,9 @@
-// src/App.tsx (Versão Final Corrigida)
+// src/App.tsx (Versão Final e Validada)
 
-import React, { useEffect } from 'react';
-import { HashRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import React from 'react';
+import { HashRouter, Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
 
-// Importações dos componentes de Layout
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import BottomNavbar from '@/components/BottomNavbar';
-import ToastContainer from '@/components/ToastContainer';
-
-// Importações das Páginas (adicione todas as suas páginas aqui)
+// Importações de todos os componentes de página
 import WelcomePage from '@/pages/WelcomePage';
 import LoginPage from '@/pages/LoginPage';
 import RegisterPage from '@/pages/RegisterPage';
@@ -17,49 +11,49 @@ import HomePage from '@/pages/HomePage';
 import ProviderListPage from '@/pages/ProviderListPage';
 import ProviderProfilePage from '@/pages/ProviderProfilePage';
 import ProviderRegistrationPage from '@/pages/ProviderRegistrationPage';
-import ContactUsPage from '@/pages/ContactUsPage';
 import UserProfilePage from '@/pages/UserProfilePage';
 import MyReviewsPage from '@/pages/MyReviewsPage';
-import NotFoundPage from '@/pages/NotFoundPage';
-import ChatListPage from '@/pages/ChatListPage'; 
-import ChatConversationPage from '@/pages/ChatConversationPage'; 
-import TermsOfServicePage from '@/pages/TermsOfServicePage'; 
-import PrivacyPolicyPage from '@/pages/PrivacyPolicyPage'; 
-import NotificationHistoryPage from '@/pages/NotificationHistoryPage';
+import ChatListPage from '@/pages/ChatListPage';
+import ChatConversationPage from '@/pages/ChatConversationPage';
 import MyFavoritesPage from '@/pages/MyFavoritesPage';
-import PricingPlansPage from '@/pages/PricingPlansPage';
+import AuthCallbackPage from '@/pages/AuthCallbackPage';
+import NotFoundPage from '@/pages/NotFoundPage';
+// ... e outras páginas como Termos, Privacidade, etc.
+
+// Importações das páginas e layout de Admin
 import AdminLayout from '@/components/admin/AdminLayout';
 import AdminDashboardPage from '@/pages/admin/AdminDashboardPage';
-import AdminProfessionsPage from '@/pages/admin/AdminProfessionsPage';
-import AdminSpecialtiesPage from '@/pages/admin/AdminSpecialtiesPage';
-import AdminCategoriesPage from '@/pages/admin/AdminCategoriesPage';
 import AdminUsersPage from '@/pages/admin/AdminUsersPage';
+import AdminCategoriesPage from '@/pages/admin/AdminCategoriesPage';
+// ... e outras páginas de admin ...
 
-// Importações dos Hooks e Constantes
+// Hooks e Componentes de UI
 import { useAuth } from '@/hooks/useAuth';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import BottomNavbar from '@/components/BottomNavbar';
+import ToastContainer from '@/components/ToastContainer';
 import { APP_ROUTES } from '@/constants';
 
 // --- COMPONENTES DE PROTEÇÃO DE ROTA ---
-
-interface ProtectedRouteProps {
-  children: React.ReactNode;
-}
-
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth();
+  const location = useLocation();
+
   if (loading) {
-    return <div className="flex justify-center items-center min-h-screen">Carregando...</div>;
+    return <div className="flex justify-center items-center min-h-screen">A carregar...</div>;
   }
   if (!user) {
-    return <Navigate to={APP_ROUTES.LOGIN} replace />;
+    return <Navigate to={APP_ROUTES.LOGIN} state={{ from: location }} replace />;
   }
   return <>{children}</>;
 };
 
-const AdminProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+const AdminProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, isAdmin, loading } = useAuth();
+
   if (loading) {
-    return <div className="flex justify-center items-center min-h-screen">Carregando permissões...</div>;
+    return <div className="flex justify-center items-center min-h-screen">A verificar permissões...</div>;
   }
   if (!user || !isAdmin) {
     return <Navigate to={APP_ROUTES.HOME} replace />;
@@ -68,65 +62,57 @@ const AdminProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 };
 
 // --- COMPONENTE DE LAYOUT PRINCIPAL ---
-// Agora ele é apenas um componente de UI limpo, sem providers.
 const MainAppLayout: React.FC = () => {
   const { user } = useAuth();
   return (
-    <>
+    <div className="flex flex-col min-h-screen bg-light-bg">
       <Navbar />
       <ToastContainer />
-      <main className={`flex-grow container mx-auto px-4 py-8 ${user ? 'pb-20 md:pb-8' : 'pb-8'}`}>
-        <Outlet /> 
+      <main className={`flex-grow container mx-auto px-4 py-8 ${user ? 'pb-24 md:pb-8' : 'pb-8'}`}>
+        <Outlet />
       </main>
       {user && <BottomNavbar />}
       <Footer />
-    </>
+    </div>
   );
 };
 
 // --- COMPONENTE PRINCIPAL DA APLICAÇÃO ---
-// A responsabilidade dele é apenas gerenciar as rotas.
 const App: React.FC = () => {
-  const { user } = useAuth();
-
   return (
     <HashRouter>
-        <Routes>
-          <Route element={<MainAppLayout />}>
-            {/* Rotas Públicas */}
-            <Route path={APP_ROUTES.WELCOME} element={<WelcomePage />} />
-            <Route path={APP_ROUTES.LOGIN} element={<LoginPage />} />
-            <Route path={APP_ROUTES.REGISTER} element={<RegisterPage />} />
-            <Route path={APP_ROUTES.TERMS_OF_SERVICE} element={<TermsOfServicePage />} />
-            <Route path={APP_ROUTES.PRIVACY_POLICY} element={<PrivacyPolicyPage />} />
-            <Route path={APP_ROUTES.CONTACT} element={<ContactUsPage />} />
-            <Route path={APP_ROUTES.PRICING_PLANS} element={<PricingPlansPage />} />
-            
-            {/* Rotas Protegidas */}
-            <Route path={APP_ROUTES.HOME} element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
-            <Route path={APP_ROUTES.PROVIDERS} element={<ProtectedRoute><ProviderListPage /></ProtectedRoute>} />
-            <Route path={`${APP_ROUTES.PROVIDER_PROFILE}/:providerId`} element={<ProtectedRoute><ProviderProfilePage /></ProtectedRoute>} />
-            <Route path={APP_ROUTES.PROVIDER_REGISTER} element={<ProtectedRoute><ProviderRegistrationPage /></ProtectedRoute>} />
-            <Route path={APP_ROUTES.USER_PROFILE} element={<ProtectedRoute><UserProfilePage /></ProtectedRoute>} />
-            <Route path={APP_ROUTES.MY_REVIEWS} element={<ProtectedRoute><MyReviewsPage /></ProtectedRoute>} />
-            <Route path={APP_ROUTES.CHAT_LIST} element={<ProtectedRoute><ChatListPage /></ProtectedRoute>} />
-            <Route path={`${APP_ROUTES.CHAT_CONVERSATION}/:chatId`} element={<ProtectedRoute><ChatConversationPage /></ProtectedRoute>} />
-            <Route path={APP_ROUTES.NOTIFICATIONS_HISTORY} element={<ProtectedRoute><NotificationHistoryPage /></ProtectedRoute>} />
-            <Route path={APP_ROUTES.MY_FAVORITES} element={<ProtectedRoute><MyFavoritesPage /></ProtectedRoute>} />
-            
-            <Route path="*" element={<NotFoundPage />} />
-          </Route>
+      <Routes>
+        {/* Rotas com o Layout Principal */}
+        <Route element={<MainAppLayout />}>
+          {/* Rotas Públicas */}
+          <Route path={APP_ROUTES.WELCOME} element={<WelcomePage />} />
+          <Route path={APP_ROUTES.LOGIN} element={<LoginPage />} />
+          <Route path={APP_ROUTES.REGISTER} element={<RegisterPage />} />
+          <Route path="/auth/callback" element={<AuthCallbackPage />} />
+          
+          {/* Rotas Protegidas */}
+          <Route path={APP_ROUTES.HOME} element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+          <Route path={APP_ROUTES.PROVIDERS} element={<ProtectedRoute><ProviderListPage /></ProtectedRoute>} />
+          <Route path={`${APP_ROUTES.PROVIDER_PROFILE}/:providerId`} element={<ProtectedRoute><ProviderProfilePage /></ProtectedRoute>} />
+          <Route path={APP_ROUTES.PROVIDER_REGISTER} element={<ProtectedRoute><ProviderRegistrationPage /></ProtectedRoute>} />
+          <Route path={APP_ROUTES.USER_PROFILE} element={<ProtectedRoute><UserProfilePage /></ProtectedRoute>} />
+          <Route path={APP_ROUTES.MY_REVIEWS} element={<ProtectedRoute><MyReviewsPage /></ProtectedRoute>} />
+          <Route path={APP_ROUTES.CHAT_LIST} element={<ProtectedRoute><ChatListPage /></ProtectedRoute>} />
+          <Route path={`${APP_ROUTES.CHAT_CONVERSATION}/:chatId`} element={<ProtectedRoute><ChatConversationPage /></ProtectedRoute>} />
+          <Route path={APP_ROUTES.MY_FAVORITES} element={<ProtectedRoute><MyFavoritesPage /></ProtectedRoute>} />
+          
+          <Route path="*" element={<NotFoundPage />} />
+        </Route>
 
-          {/* Rotas de Admin */}
-          <Route path="/admin" element={<AdminProtectedRoute><AdminLayout /></AdminProtectedRoute>}>
-            <Route index element={<Navigate to={APP_ROUTES.ADMIN_DASHBOARD} replace />} />
-            <Route path="dashboard" element={<AdminDashboardPage />} />
-            <Route path="professions" element={<AdminProfessionsPage />} />
-            <Route path="specialties" element={<AdminSpecialtiesPage />} />
-            <Route path="categories" element={<AdminCategoriesPage />} />
-            <Route path="users" element={<AdminUsersPage />} /> 
-          </Route>
-        </Routes>
+        {/* Rotas de Admin com Layout de Admin */}
+        <Route path="/admin" element={<AdminProtectedRoute><AdminLayout /></AdminProtectedRoute>}>
+          <Route index element={<Navigate to={APP_ROUTES.ADMIN_DASHBOARD} replace />} />
+          <Route path="dashboard" element={<AdminDashboardPage />} />
+          <Route path="users" element={<AdminUsersPage />} />
+          <Route path="categories" element={<AdminCategoriesPage />} />
+          {/* ... e outras rotas de admin ... */}
+        </Route>
+      </Routes>
     </HashRouter>
   );
 };

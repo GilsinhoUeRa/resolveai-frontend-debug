@@ -65,6 +65,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     logout,
     loading: isLoadingUser || isLoggingIn || isRegistering, // 2. Adicionado 'isRegistering' ao estado de loading
     isAdmin: user?.role === 'admin',
+	setToken,
   };
 
   return (
