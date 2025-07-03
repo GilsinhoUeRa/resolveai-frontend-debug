@@ -10,7 +10,7 @@ interface ProfessionCardProps {
 
 const ProfessionCard: React.FC<ProfessionCardProps> = ({ profession }) => {
   // Placeholder image if imageUrl is not available
-  const defaultImageUrl = "https://via.placeholder.com/300x200?text=Serviço";
+  const defaultImageUrl = "https://placehold.co/300x200";
 
   return (
     <Link to={`${APP_ROUTES.PROVIDERS}?profession=${profession.id}`} className="block group">
