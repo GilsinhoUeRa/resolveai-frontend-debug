@@ -15,6 +15,7 @@ import AuthCallbackPage from '@/pages/AuthCallbackPage';
 import HomePage from '@/pages/HomePage';
 // ... importe todas as suas outras páginas ...
 import AdminDashboardPage from '@/pages/admin/AdminDashboardPage';
+import NotFoundPage from '@/pages/NotFoundPage';
 
 import { APP_ROUTES } from '@/constants';
 
@@ -36,8 +37,7 @@ const App: React.FC = () => {
             <Route path={APP_ROUTES.HOME} element={<HomePage />} />
             {/* ... adicione todas as outras rotas protegidas aqui ... */}
           </Route>
-
-          <Route path="*" element={<NotFoundPage />} />
+		  <Route path="*" element={<NotFoundPage />} />
         </Route>
 
         {/* Rotas de Admin */}
