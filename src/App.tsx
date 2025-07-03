@@ -11,6 +11,7 @@ import ProtectedRoute from '@/components/ProtectedRoute'; // <-- IMPORTAÇÃO CO
 import WelcomePage from '@/pages/WelcomePage';
 import LoginPage from '@/pages/LoginPage';
 import RegisterPage from '@/pages/RegisterPage';
+import CompleteRegistrationPage from '@/pages/CompleteRegistrationPage';
 import AuthCallbackPage from '@/pages/AuthCallbackPage';
 import HomePage from '@/pages/HomePage';
 // ... importe todas as suas outras páginas ...
@@ -30,6 +31,7 @@ const App: React.FC = () => {
           <Route path={APP_ROUTES.LOGIN} element={<LoginPage />} />
           <Route path={APP_ROUTES.REGISTER} element={<RegisterPage />} />
           <Route path="/auth/callback" element={<AuthCallbackPage />} />
+		  <Route path="/complete-registration" element={<CompleteRegistrationPage />} />
 
           {/* --- Rotas Protegidas --- */}
           {/* Todas as rotas dentro deste elemento exigirão login */}
