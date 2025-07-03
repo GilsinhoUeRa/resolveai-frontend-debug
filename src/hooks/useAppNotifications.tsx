@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { AppNotification, AppNotificationContextType, ChatSession } from '@/types';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from './useAuthHook';
 // import { useChat } from './useChat'; // Temporariamente comentado, pois notificações virão da API
 
 const APP_NOTIFICATIONS_STORAGE_KEY = 'resolveai_app_notifications_v2'; // Mudado para evitar conflito

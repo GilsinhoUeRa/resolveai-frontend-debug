@@ -6,7 +6,7 @@ import {
     getChatSessionsApi, 
     sendMessageApi, 
     startOrGetChatSessionApi,
-    getMessagesForSessionApi // Importa a função que faltava
+    getMessagesForSessionApi
 } from '@/services/chat.api';
 import { ChatContextType, ChatSession, ChatMessage } from '@/types';
 
@@ -37,13 +37,19 @@ export const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         },
     });
 
-    // Função para buscar mensagens, que na verdade é uma chamada direta à API
-    // Não precisa de um useQuery aqui, pois cada página de chat fará a sua própria query.
     const getMessagesForSession = (sessionId: string): Promise<ChatMessage[]> => {
         return getMessagesForSessionApi(sessionId);
     };
 
-    // O valor do contexto agora está completo e corretamente tipado
     const contextValue: ChatContextType = {
         chatSessions,
         loadingSessions,
+        getMessagesForSession,
+        sendMessage: sendMessageMutation.mutateAsync,
+        startOrGetChatSession: startChatMutation.mutateAsync,
+        isLoadingMessages: (sessionId: string) => false, 
+        markSessionAsRead: (sessionId: string) => {},
+    };
+
+    return <ChatContext.Provider value={contextValue}>{children}</ChatContext.Provider>;
+};
