@@ -1,15 +1,19 @@
-// src/hooks/useAuth.tsx (Versão Final e Completa)
+// src/hooks/useAuth.tsx (Versão Final - Apenas Contexto e Provider)
 
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import React, { createContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+// Funções de API e Tipos
 import { loginApi, registerApi } from '@/services/auth.api';
 import apiClient from '@/services/api';
 import { User, ProviderDetails, AuthContextType, LoginCredentials, AuthResponse, RegisterData } from '@/types';
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+// 1. O contexto é exportado para ser usado pelo hook em outro arquivo.
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
 const JWT_STORAGE_KEY = 'authToken';
 
+// 2. O AuthProvider continua a ser a peça central que encapsula a lógica.
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const queryClient = useQueryClient();
   const [token, setToken] = useState<string | null>(() => localStorage.getItem(JWT_STORAGE_KEY));
@@ -45,7 +49,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     mutationFn: registerApi,
     onSuccess: (newUser) => {
       console.log('Usuário registrado com sucesso:', newUser);
-      // Não fazemos login automático, o usuário será redirecionado para a página de login.
     },
   });
 
@@ -56,16 +59,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     queryClient.removeQueries({ queryKey: ['chatSessions'] });
   }, [queryClient]);
 
-  // --- CORREÇÃO APLICADA AQUI ---
   const contextValue: AuthContextType = {
     user: user ?? null,
     token,
     login,
-    register, // 1. Adicionada a função 'register' ao contexto
+    register,
     logout,
-    loading: isLoadingUser || isLoggingIn || isRegistering, // 2. Adicionado 'isRegistering' ao estado de loading
+    loading: isLoadingUser || isLoggingIn || isRegistering,
     isAdmin: user?.role === 'admin',
-	setToken,
+    setToken,
   };
 
   return (
@@ -73,12 +75,4 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       {children}
     </AuthContext.Provider>
   );
-};
-
-export const useAuth = (): AuthContextType => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth deve ser usado dentro de um AuthProvider');
-  }
-  return context;
 };
