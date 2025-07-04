@@ -1,11 +1,11 @@
 // src/App.tsx (Versão Final e Corrigida)
 import React from 'react';
-import { HashRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 // Componentes de Layout e Proteção de Rota
-import MainLayout from '@/layouts/MainLayout'; // Assumindo que você criou este ficheiro
+import MainLayout from '@/layouts/MainLayout';
 import AdminLayout from '@/components/admin/AdminLayout';
-import ProtectedRoute from '@/components/ProtectedRoute'; // <-- IMPORTAÇÃO CORRETA
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 // Páginas
 import WelcomePage from '@/pages/WelcomePage';
@@ -14,8 +14,11 @@ import RegisterPage from '@/pages/RegisterPage';
 import CompleteRegistrationPage from '@/pages/CompleteRegistrationPage';
 import AuthCallbackPage from '@/pages/AuthCallbackPage';
 import HomePage from '@/pages/HomePage';
+import UserProfilePage from '@/pages/UserProfilePage';
+import ProviderRegistrationPage from '@/pages/ProviderRegistrationPage';
 // ... importe todas as suas outras páginas ...
 import AdminDashboardPage from '@/pages/admin/AdminDashboardPage';
+import AdminUsersPage from '@/pages/admin/AdminUsersPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 
 import { APP_ROUTES } from '@/constants';
@@ -24,30 +27,32 @@ const App: React.FC = () => {
   return (
     <HashRouter>
       <Routes>
-        {/* Rotas de Layout Principal */}
-        <Route element={<MainLayout />}>
-          {/* Rotas Públicas */}
-          <Route path={APP_ROUTES.WELCOME} element={<WelcomePage />} />
+        {/* Rotas que utilizam o Layout Principal */}
+        <Route path="/" element={<MainLayout />}>
+          {/* --- ROTAS PÚBLICAS --- */}
+          <Route index element={<WelcomePage />} />
           <Route path={APP_ROUTES.LOGIN} element={<LoginPage />} />
           <Route path={APP_ROUTES.REGISTER} element={<RegisterPage />} />
           <Route path="/auth/callback" element={<AuthCallbackPage />} />
-		  <Route path="/complete-registration" element={<CompleteRegistrationPage />} />
+          <Route path="/complete-registration" element={<CompleteRegistrationPage />} />
 
-          {/* --- Rotas Protegidas --- */}
-          {/* Todas as rotas dentro deste elemento exigirão login */}
+          {/* --- ROTAS PROTEGIDAS (exigem login) --- */}
           <Route element={<ProtectedRoute />}>
             <Route path={APP_ROUTES.HOME} element={<HomePage />} />
-            {/* ... adicione todas as outras rotas protegidas aqui ... */}
+            <Route path={APP_ROUTES.USER_PROFILE} element={<UserProfilePage />} />
+            {/* Adicione aqui todas as outras rotas que um utilizador logado pode aceder */}
           </Route>
-		  <Route path="*" element={<NotFoundPage />} />
+
+          {/* A rota "Não Encontrado" deve ser a última rota dentro do layout principal */}
+          <Route path="*" element={<NotFoundPage />} />
         </Route>
 
-        {/* Rotas de Admin */}
-        {/* O wrapper externo verifica se o utilizador tem a role 'ADMIN' */}
+        {/* Rotas de Admin (utilizam um layout e proteção específicos) */}
         <Route path="/admin" element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
           <Route element={<AdminLayout />}>
               <Route index element={<Navigate to={APP_ROUTES.ADMIN_DASHBOARD} replace />} />
               <Route path="dashboard" element={<AdminDashboardPage />} />
+              <Route path="users" element={<AdminUsersPage />} />
               {/* ... outras rotas de admin ... */}
           </Route>
         </Route>
